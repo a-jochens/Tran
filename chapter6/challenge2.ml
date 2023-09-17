@@ -1,10 +1,34 @@
 (* Merge two streams *)
 
+type 'a stream = Cons of 'a * 'a stream Lazy.t;;
+
+let stream_hd (Cons (h, _)) = h;;
+let stream_tl (Cons (_, t)) = Lazy.force t;;
+
+let rec naturals_from n = Cons (n, lazy (naturals_from (n+1)));;
+
+let naturals = naturals_from 0;;
+
 let rec stream_take n s = if n <= 0 then []
                           else stream_hd s :: stream_take (n - 1) (stream_tl s);;
 
-let evens = <0; 2; 4; 6; 8; ...>;;
-let odds = <1; 3; 5; 7; 9; ...>;;
+let rec stream_map f s = Cons (f (stream_hd s), lazy (stream_map f (stream_tl s)));;
+
+let rec stream_filter p s = 
+    if p (stream_hd s) then Cons (stream_hd s, lazy (stream_filter p (stream_tl s)))
+    else stream_filter p (stream_tl s);;
+
+let evens = stream_filter (fun x -> x mod 2 = 0) naturals;;
+let odds = stream_filter (fun x -> x mod 2 = 1) naturals;;
+
+let rec stream_zip_with f s1 s2 =
+    Cons (f (stream_hd s1) (stream_hd s2), 
+          lazy (stream_zip_with f (stream_tl s1) (stream_tl s2)));; 
+
+
+
+          
+
 
 
 let rec stream_merge s1 s2 = s1;;
