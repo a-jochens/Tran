@@ -1,5 +1,7 @@
 (* Merge two streams *)
 
+(* Assorted Definitions from Chapter 6 *)
+
 type 'a stream = Cons of 'a * 'a stream Lazy.t;;
 
 let stream_hd (Cons (h, _)) = h;;
@@ -26,20 +28,14 @@ let rec stream_zip_with f s1 s2 =
           lazy (stream_zip_with f (stream_tl s1) (stream_tl s2)));; 
 
 
-
+(* Challenge 2 *)
           
+let rec stream_merge s1 s2 = Cons (stream_hd s1, lazy (stream_merge s2 (stream_tl s1)));;
 
 
-
-let rec stream_merge s1 s2 = s1;;
-
-
-
-
-
-
+(* Tests *)
 
 let print_list l = List.iter (Printf.printf "%d ") l;;
 
 print_list (stream_take 10 (stream_merge evens odds));;
-
+print_list (stream_take 10 (stream_merge odds evens));;
